@@ -1,0 +1,85 @@
+
+<?php
+if (isset($_POST['signup-submit'])) {
+	require 'dbh.inc.php';//this is the database linked to this page
+	//fetch info from form
+	$username = $_POST['uid'];
+	$email = $_POST['mail'];
+	$password = $_POST['pwd'];
+	$passwordRepeat = $_POST['pwd-repeat'];
+
+   //check for errors in users input
+   //basic error handlers that will send the user back to the form will details still intact
+
+	//1st check for empty fields
+	if (empty($username) || empty($email) || empty($password) || empty($passwordRepeat)) {
+		header("location: ../index.php?error=emptyfields&uid=".$username."&mail=".$email);
+		exit();//exit() will stop the rest of the code from running
+	}//next check if both email and username are valid
+
+	elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		header("location: ../index.php?error=invalidmailuid=");
+		exit();
+	}//next check if email is valid
+
+	elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+	    header("location: ../index.php?error=invalidmail&uid=".$username);
+		exit();
+	}//next check if username is valid. #refernce search patterns 
+
+	elseif (!preg_match("/^[a-zA-Z0-9]*$/", $username)) {
+	    header("location: ../index.php?error=invaliduid&mail=".$email);
+		exit();
+	}//next check if the two password inputs match each other
+
+	elseif ($password !== $passwordRepeat) {
+	    header("location: ../index.php?error=passwordcheck&uid=".$username."&mail=".$email);
+		exit();
+	}//next is an additional check if there is an existing username
+
+	else{
+		$sql = "SELECT username FROM bluestartb WHERE username=?";
+		//create a prepared statement to refer to our $conn variable that is in the database page 
+		$stmt = mysqli_stmt_init($conn);
+		//check if the connection works using an if statement
+		if (!mysqli_stmt_prepare($stmt, $sql)) {
+		   header("location: ../index.php?error=sqlerror");
+		   exit();
+		}//next we need to take the info the user gave,put it inside the DB and run it against the $sql statement
+
+		else{
+			mysqli_stmt_bind_param($stmt, "s", $username);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			$resultCheck = mysqli_stmt_num_rows($stmt);
+
+			if ($resultCheck > 0) {
+				header("location: ../index.php?error=usertaken&mail=".$email);
+		        exit();
+			}	
+			else{
+			   $sql = "INSERT INTO bluestartb (username, email, password) VALUES (?, ?, ?)";	
+			   $stmt = mysqli_stmt_init($conn); 
+			   if (!mysqli_stmt_prepare($stmt, $sql)) {
+		         header("location: ../index.php?error=sqlerror");
+		         exit();
+				}
+				else{
+					$hashedPwd = password_hash($password, PASSWORD_DEFAULT);
+
+					mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashedPwd);
+					mysqli_stmt_execute($stmt);
+					header("location: ../index.php?signup=success");
+		            exit();
+				    }
+			}
+				 
+		}
+	}
+	mysql_stmt_close($stmt);
+	mysql_close($conn);//close the connection
+}
+else{
+	 header("location: ../index.php");
+	 exit();
+}

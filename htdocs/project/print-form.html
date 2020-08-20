@@ -1,0 +1,140 @@
+<?php
+ session_start();
+	function load_county() {
+		$connect=mysqli_connect("localhost", "root", "", "test");
+		$output='';
+		
+		$sql="SELECT countyId, countyName 
+			FROM counties 
+				ORDER BY countyName";
+		$result=mysqli_query($connect, $sql);
+		$output .='<option value="">Select County</option>';
+
+		while($row=mysqli_fetch_array($result)) {
+			$output .='<option value="'.$row["countyId"].'">'.$row["countyName"].'</option>';
+		}		
+		return $output;
+	}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta content="text/html; charset=iso-8859-1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Dymanism with Jquery, Ajax, PHP & MySQL</title>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/loc.js"></script>
+		<style type="text/css">
+			legend{
+				color:#fff;
+				letter-spacing:2px;
+				text-align:center;
+				font-size:40px;
+				font-weight:bolder;
+			}
+			body{
+				background:url("images/ministry.jpg");
+				background-repeat:no-repeat;
+				background-size:cover;
+				color:#fff;
+				font-size:25px;
+				text-transform:capitalize;
+				font-weight:bolder;
+				
+			}input{
+				border-style:solid;
+			}
+			input:hover{
+				border-color:green;
+			}
+			input:focus{
+				border-color:blue;
+			}
+			#a{
+				width:120px;
+				height:100px;
+				float:left;
+			}
+			#b{
+				width:120px;
+				height:100px;
+				float:center;
+			}
+			#c{
+				width:100px;
+				height:100px;
+				float:right;
+				
+				
+			}
+		
+		</style>
+	</head>
+	
+	<body>
+	<img id="a" src="images\ministry.jpg" alt="logo">
+	<img id="b" src="images\unicefb.png" alt="logo">	
+	<img id="c" src="images\vision2030.jpg" alt="logo">
+	<br>
+	<br>
+	
+	<br>
+	<form action="upload.php" method= "post">
+<Fieldset>
+<legend ><strong><em>CHILD DETAILS</em></strong></legend>
+
+
+	<label>Name:</label>
+		<input type="text" name="Name" style="width: 233px" autocomplete="off" required>
+	
+		<label>Surname of Father:</label>
+		<input type="text" name="Surname" style="width: 304px" autocomplete="off" required >
+	<br></br>
+
+		<label>Date of Birth:</label>
+		<input type="date" name="d_o_b" placeholder="DD-MM-YEAR" required />
+	<br></br>	
+	<label.
+		<label>Sex:</label>
+		<input type="radio" name="gender" value="male" required />Male	
+		
+		<input type="radio" name="gender" value="female" required />Female
+	<br></br>	
+		<label>Name of mother/Maiden:</label>
+		<input type="text" name="Mother" autocomplete="off" required />
+	<br></br>
+	
+	
+		<label>Description:</label>
+		<textarea type="text" name="bio" id="bio" cols="50" required> </textarea>
+		<br></br>
+				
+			<label>Location of Birth:</label>
+			
+				<b>County: </b>
+				<select name="county" id="county">
+					<option value="" required>Select County</option>
+					<?php echo load_county(); ?>
+				</select>
+				
+				<b>Constituency:</b>
+				<select name="const" id="const">
+					<option value="" required>Select Constituency</option>
+				</select>
+			
+			<b>Ward:</b>
+			<select name="ward" id="ward">
+				<option value="ward" required>Select Ward</option>
+			</select>
+		
+		
+		<br></br>
+			
+				<input type="submit" name="registry" value="SUBMIT"/>
+				<input type="reset"value="RESET"/>
+			</form>
+	
+		</fieldset>
+	</body>
+<html>
